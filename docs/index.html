@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SnapMark — screenshot Windows dengan anotasi yang tetap bisa diedit</title>
+<meta name="description" content="SnapMark menangkap layar Windows dan menambahkan anotasi sebagai objek yang tetap bisa diedit. Tanpa telemetri, tangkapan tidak pernah keluar dari komputer Anda.">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%232563eb'/%3E%3Cpath d='M9 12V9h3M20 9h3v3M23 20v3h-3M12 23H9v-3' stroke='%23fff' stroke-width='2.4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg: #fafaf9; --surface: #ffffff; --text: #1c1917; --muted: #57534e; --line: #e7e5e4;
+    --accent: #2563eb; --accent-text: #ffffff; --mark: #dc2626; --shot: #e0e7ff; --shot2: #c7d2fe;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #141413; --surface: #1f1e1d; --text: #f5f5f4; --muted: #a8a29e; --line: #2e2c2a;
+      --accent: #60a5fa; --accent-text: #0b1220; --mark: #f87171; --shot: #27304a; --shot2: #323d5f;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: var(--bg); color: var(--text); line-height: 1.6;
+    font-family: system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+  a { color: var(--accent); }
+  .wrap { max-width: 64rem; margin: 0 auto; padding: 0 1.25rem; }
+  header { border-bottom: 1px solid var(--line); }
+  header .wrap { display: flex; align-items: center; justify-content: space-between; height: 3.5rem; gap: 1rem; }
+  .brand { display: flex; align-items: center; gap: .6rem; font-weight: 700; color: var(--text); text-decoration: none; }
+  .brand svg { width: 1.6rem; height: 1.6rem; }
+  nav { display: flex; align-items: center; gap: 1.25rem; font-size: .95rem; }
+  nav a { color: var(--muted); text-decoration: none; }
+  nav a:hover { color: var(--text); }
+  .lang button { font: inherit; font-size: .85rem; color: var(--muted); background: none; border: 1px solid var(--line);
+    padding: .15rem .55rem; cursor: pointer; }
+  .lang button:first-child { border-radius: .4rem 0 0 .4rem; }
+  .lang button:last-child { border-radius: 0 .4rem .4rem 0; border-left: 0; }
+  .lang button[aria-pressed="true"] { background: var(--text); color: var(--bg); border-color: var(--text); }
+  .hero { padding-block: 4rem 3rem; display: grid; grid-template-columns: 1.1fr 1fr; gap: 3rem; align-items: center; }
+  h1 { font-size: clamp(2rem, 4.5vw, 3rem); line-height: 1.15; margin: 0 0 1rem; letter-spacing: -.02em; }
+  .lead { font-size: 1.15rem; color: var(--muted); margin: 0 0 1.75rem; max-width: 32rem; }
+  .cta { display: flex; flex-wrap: wrap; align-items: center; gap: .9rem 1.25rem; }
+  .btn { display: inline-block; background: var(--accent); color: var(--accent-text); font-weight: 600; text-decoration: none;
+    padding: .8rem 1.4rem; border-radius: .6rem; }
+  .btn:hover { filter: brightness(1.08); }
+  .meta { font-size: .9rem; color: var(--muted); }
+  .art { width: 100%; height: auto; }
+  section { padding: 3rem 0; border-top: 1px solid var(--line); }
+  h2 { font-size: 1.6rem; margin: 0 0 .5rem; letter-spacing: -.01em; }
+  .sub { color: var(--muted); margin: 0 0 2rem; max-width: 40rem; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 1rem; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: .8rem; padding: 1.25rem; }
+  .card h3 { margin: 0 0 .35rem; font-size: 1.05rem; }
+  .card p { margin: 0; color: var(--muted); font-size: .95rem; }
+  ol.steps { list-style: none; padding: 0; margin: 0; display: grid; gap: 1rem; counter-reset: s; }
+  ol.steps li { counter-increment: s; display: flex; gap: 1rem; align-items: flex-start; }
+  ol.steps li::before { content: counter(s); flex: none; width: 2rem; height: 2rem; border-radius: 50%; background: var(--mark);
+    color: #fff; font-weight: 700; display: grid; place-items: center; }
+  ol.steps strong { display: block; }
+  ol.steps span { color: var(--muted); }
+  kbd { font: inherit; font-size: .85em; background: var(--surface); border: 1px solid var(--line); border-bottom-width: 2px;
+    border-radius: .3rem; padding: .05rem .4rem; white-space: nowrap; }
+  .guides { display: flex; flex-wrap: wrap; gap: .5rem; padding: 0; margin: 0; list-style: none; }
+  .guides a { display: block; padding: .4rem .8rem; border: 1px solid var(--line); border-radius: .5rem; text-decoration: none;
+    background: var(--surface); color: var(--text); }
+  .guides a:hover { border-color: var(--accent); }
+  footer { border-top: 1px solid var(--line); padding: 2rem 0 3rem; color: var(--muted); font-size: .9rem; }
+  @media (max-width: 760px) { .hero { grid-template-columns: 1fr; padding-top: 2.5rem; } nav .hide-sm { display: none; } }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="SnapMark">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#2563eb"/><path d="M9 12V9h3M20 9h3v3M23 20v3h-3M12 23H9v-3" stroke="#fff" stroke-width="2.4" fill="none" stroke-linecap="round"/></svg>
+      SnapMark
+    </a>
+    <nav>
+      <a class="hide-sm" href="#fitur" data-i18n="nav.features">Fitur</a>
+      <a class="hide-sm" href="#cara" data-i18n="nav.how">Cara kerja</a>
+      <a class="hide-sm" href="#panduan" data-i18n="nav.guide">Panduan</a>
+      <span class="lang" role="group" aria-label="Language">
+        <button type="button" data-lang="id" aria-pressed="true">ID</button><button type="button" data-lang="en" aria-pressed="false">EN</button>
+      </span>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <div class="wrap hero">
+    <div>
+      <h1 data-i18n="hero.title">Screenshot dengan anotasi yang tetap bisa diedit.</h1>
+      <p class="lead" data-i18n="hero.lead">Tangkap layar Windows, tandai dengan kotak, panah, teks, dan sensor. Setiap tanda adalah objek tersendiri, jadi bisa digeser, diubah, atau dihapus kapan saja, bahkan setelah disimpan.</p>
+      <div class="cta">
+        <a class="btn" id="dl" href="https://github.com/fajarsutomo/snapmark-releases/releases/latest" data-i18n="cta.download">Unduh untuk Windows</a>
+        <span class="meta" id="dl-meta" data-i18n="cta.meta">Windows 64-bit</span>
+      </div>
+    </div>
+    <svg class="art" viewBox="0 0 440 320" role="img" aria-label="Ilustrasi: area tangkapan dengan anotasi panah, kotak, dan nomor langkah" data-i18n-aria="art.alt">
+      <rect x="10" y="10" width="420" height="300" rx="14" fill="var(--surface)" stroke="var(--line)"/>
+      <rect x="10" y="10" width="420" height="34" rx="14" fill="var(--shot2)"/>
+      <rect x="10" y="30" width="420" height="14" fill="var(--shot2)"/>
+      <rect x="28" y="62" width="150" height="14" rx="4" fill="var(--shot2)"/>
+      <rect x="28" y="88" width="230" height="10" rx="4" fill="var(--shot)"/>
+      <rect x="28" y="108" width="200" height="10" rx="4" fill="var(--shot)"/>
+      <rect x="28" y="140" width="384" height="150" rx="8" fill="var(--shot)"/>
+      <rect x="44" y="156" width="120" height="70" rx="6" fill="var(--shot2)"/>
+      <rect x="180" y="156" width="214" height="12" rx="4" fill="var(--shot2)"/>
+      <rect x="180" y="178" width="170" height="12" rx="4" fill="var(--shot2)"/>
+      <rect x="180" y="200" width="190" height="12" rx="4" fill="var(--shot2)"/>
+      <rect x="44" y="244" width="350" height="30" rx="6" fill="#111" opacity=".85"/>
+      <rect x="36" y="146" width="148" height="86" rx="3" fill="none" stroke="var(--mark)" stroke-width="3"/>
+      <path d="M330 78 L196 148" stroke="var(--mark)" stroke-width="3.5" stroke-linecap="round"/>
+      <path d="M196 148 l15 -2 M196 148 l7 -14" stroke="var(--mark)" stroke-width="3.5" stroke-linecap="round"/>
+      <circle cx="350" cy="68" r="15" fill="var(--mark)"/>
+      <text x="350" y="74" text-anchor="middle" font-size="17" font-weight="700" fill="#fff" font-family="system-ui,sans-serif">1</text>
+    </svg>
+  </div>
+
+  <section id="fitur">
+    <div class="wrap">
+      <h2 data-i18n="feat.title">Dibuat agar hasilnya tetap bisa diperbaiki</h2>
+      <p class="sub" data-i18n="feat.sub">Gambar asli tidak pernah diubah. Semua tanda disimpan terpisah di atasnya.</p>
+      <div class="grid">
+        <div class="card"><h3 data-i18n="f1.t">Anotasi yang bisa diedit</h3><p data-i18n="f1.d">Persegi, elips, garis, panah, pena, penyorot, nomor langkah, dan teks. Klik untuk memilih, geser, ubah ukuran, warna, atau ketebalan.</p></div>
+        <div class="card"><h3 data-i18n="f2.t">Undo/redo dan proyek</h3><p data-i18n="f2.d">Simpan sebagai proyek <code>.snapmark</code> untuk membukanya lagi dan melanjutkan mengedit. Setiap salin atau simpan juga masuk riwayat.</p></div>
+        <div class="card"><h3 data-i18n="f3.t">Sensor yang aman</h3><p data-i18n="f3.d">Mosaik, buram, atau blok hitam. Hasil PNG hanya berisi bagian yang sudah disensor, dan SnapMark memperingatkan sebelum Anda menyimpan proyek yang berisi sensor.</p></div>
+        <div class="card"><h3 data-i18n="f4.t">Resolusi asli</h3><p data-i18n="f4.d">Hasil ekspor memakai resolusi layar asli, hanya area terpilih, sama persis dengan yang Anda lihat. Area bisa digeser dan diubah ukurannya kapan saja.</p></div>
+        <div class="card"><h3 data-i18n="f5.t">Cepat dan ringkas</h3><p data-i18n="f5.d">Berjalan di area notifikasi. Tekan <kbd>Print Screen</kbd> (bisa diganti), pilih area, tekan <kbd>Enter</kbd> untuk menyalin atau <kbd>Ctrl</kbd>+<kbd>S</kbd> untuk menyimpan.</p></div>
+        <div class="card"><h3 data-i18n="f6.t">13 bahasa</h3><p data-i18n="f6.d">Antarmuka dan panduan dalam Indonesia, English, Español, Deutsch, 日本語, 简体中文, Français, Italiano, Português, 한국어, Русский, العربية, dan Nederlands.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="cara">
+    <div class="wrap">
+      <h2 data-i18n="how.title">Tiga langkah</h2>
+      <p class="sub" data-i18n="how.sub">Dari layar ke hasil jadi tanpa membuka aplikasi lain.</p>
+      <ol class="steps">
+        <li><div><strong data-i18n="s1.t">Tangkap</strong><span data-i18n="s1.d">Tekan Print Screen, lalu seret untuk memilih area.</span></div></li>
+        <li><div><strong data-i18n="s2.t">Tandai</strong><span data-i18n="s2.d">Pilih alat di bilah alat dan tambahkan anotasi. Ubah kapan saja.</span></div></li>
+        <li><div><strong data-i18n="s3.t">Salin atau simpan</strong><span data-i18n="s3.d">Enter untuk menyalin ke clipboard, Ctrl+S untuk menyimpan PNG.</span></div></li>
+      </ol>
+    </div>
+  </section>
+
+  <section id="privasi">
+    <div class="wrap">
+      <h2 data-i18n="priv.title">Privasi</h2>
+      <p class="sub" data-i18n="priv.d">Tangkapan dan proyek tidak pernah keluar dari komputer Anda. Tidak ada telemetri. Satu-satunya akses jaringan adalah memeriksa pembaruan.</p>
+    </div>
+  </section>
+
+  <section id="panduan">
+    <div class="wrap">
+      <h2 data-i18n="guide.title">Panduan penggunaan</h2>
+      <p class="sub" data-i18n="guide.sub">Pilih bahasa Anda.</p>
+      <ul class="guides" id="guides"></ul>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span data-i18n="foot.d">SnapMark untuk Windows. Installer dan catatan rilis ada di</span>
+    <a href="https://github.com/fajarsutomo/snapmark-releases/releases">GitHub Releases</a>.
+  </div>
+</footer>
+
+<script>
+(function () {
+  var REPO = "fajarsutomo/snapmark-releases";
+  var T = {
+    id: {
+      "nav.features": "Fitur", "nav.how": "Cara kerja", "nav.guide": "Panduan",
+      "hero.title": "Screenshot dengan anotasi yang tetap bisa diedit.",
+      "hero.lead": "Tangkap layar Windows, tandai dengan kotak, panah, teks, dan sensor. Setiap tanda adalah objek tersendiri, jadi bisa digeser, diubah, atau dihapus kapan saja, bahkan setelah disimpan.",
+      "cta.download": "Unduh untuk Windows", "cta.meta": "Windows 64-bit",
+      "art.alt": "Ilustrasi: area tangkapan dengan anotasi panah, kotak, dan nomor langkah",
+      "feat.title": "Dibuat agar hasilnya tetap bisa diperbaiki",
+      "feat.sub": "Gambar asli tidak pernah diubah. Semua tanda disimpan terpisah di atasnya.",
+      "f1.t": "Anotasi yang bisa diedit", "f1.d": "Persegi, elips, garis, panah, pena, penyorot, nomor langkah, dan teks. Klik untuk memilih, geser, ubah ukuran, warna, atau ketebalan.",
+      "f2.t": "Undo/redo dan proyek", "f2.d": "Simpan sebagai proyek <code>.snapmark</code> untuk membukanya lagi dan melanjutkan mengedit. Setiap salin atau simpan juga masuk riwayat.",
+      "f3.t": "Sensor yang aman", "f3.d": "Mosaik, buram, atau blok hitam. Hasil PNG hanya berisi bagian yang sudah disensor, dan SnapMark memperingatkan sebelum Anda menyimpan proyek yang berisi sensor.",
+      "f4.t": "Resolusi asli", "f4.d": "Hasil ekspor memakai resolusi layar asli, hanya area terpilih, sama persis dengan yang Anda lihat. Area bisa digeser dan diubah ukurannya kapan saja.",
+      "f5.t": "Cepat dan ringkas", "f5.d": "Berjalan di area notifikasi. Tekan <kbd>Print Screen</kbd> (bisa diganti), pilih area, tekan <kbd>Enter</kbd> untuk menyalin atau <kbd>Ctrl</kbd>+<kbd>S</kbd> untuk menyimpan.",
+      "f6.t": "13 bahasa", "f6.d": "Antarmuka dan panduan dalam Indonesia, English, Español, Deutsch, 日本語, 简体中文, Français, Italiano, Português, 한국어, Русский, العربية, dan Nederlands.",
+      "how.title": "Tiga langkah", "how.sub": "Dari layar ke hasil jadi tanpa membuka aplikasi lain.",
+      "s1.t": "Tangkap", "s1.d": "Tekan Print Screen, lalu seret untuk memilih area.",
+      "s2.t": "Tandai", "s2.d": "Pilih alat di bilah alat dan tambahkan anotasi. Ubah kapan saja.",
+      "s3.t": "Salin atau simpan", "s3.d": "Enter untuk menyalin ke clipboard, Ctrl+S untuk menyimpan PNG.",
+      "priv.title": "Privasi", "priv.d": "Tangkapan dan proyek tidak pernah keluar dari komputer Anda. Tidak ada telemetri. Satu-satunya akses jaringan adalah memeriksa pembaruan.",
+      "guide.title": "Panduan penggunaan", "guide.sub": "Pilih bahasa Anda.",
+      "foot.d": "SnapMark untuk Windows. Installer dan catatan rilis ada di",
+      "ver": "Versi {v} · Windows 64-bit"
+    },
+    en: {
+      "nav.features": "Features", "nav.how": "How it works", "nav.guide": "Guide",
+      "hero.title": "Screenshots with annotations you can still edit.",
+      "hero.lead": "Capture your Windows screen and mark it up with boxes, arrows, text and redactions. Every mark is its own object, so you can move, change or delete it at any time, even after saving.",
+      "cta.download": "Download for Windows", "cta.meta": "Windows 64-bit",
+      "art.alt": "Illustration: a captured area with an arrow, a box and a numbered step",
+      "feat.title": "Built so your result stays fixable",
+      "feat.sub": "The original image is never changed. Every mark is stored separately on top of it.",
+      "f1.t": "Editable annotations", "f1.d": "Rectangle, ellipse, line, arrow, pen, highlighter, step numbers and text. Click to select, then move, resize, or change color and thickness.",
+      "f2.t": "Undo/redo and projects", "f2.d": "Save as a <code>.snapmark</code> project to reopen it and keep editing. Every copy or save is also kept in your history.",
+      "f3.t": "Safe redaction", "f3.d": "Mosaic, blur, or solid black. The PNG contains only the redacted result, and SnapMark warns you before you save a project that contains a redaction.",
+      "f4.t": "Original resolution", "f4.d": "Exports use the screen's native resolution, only the selected area, exactly as you see it. You can move and resize the area at any time.",
+      "f5.t": "Fast and light", "f5.d": "Lives in the notification area. Press <kbd>Print Screen</kbd> (configurable), pick an area, then <kbd>Enter</kbd> to copy or <kbd>Ctrl</kbd>+<kbd>S</kbd> to save.",
+      "f6.t": "13 languages", "f6.d": "Interface and guides in Indonesian, English, Spanish, German, Japanese, Chinese, French, Italian, Portuguese, Korean, Russian, Arabic and Dutch.",
+      "how.title": "Three steps", "how.sub": "From screen to finished image without opening another app.",
+      "s1.t": "Capture", "s1.d": "Press Print Screen, then drag to choose an area.",
+      "s2.t": "Mark up", "s2.d": "Pick a tool in the toolbar and add annotations. Change them any time.",
+      "s3.t": "Copy or save", "s3.d": "Enter copies to the clipboard, Ctrl+S saves a PNG.",
+      "priv.title": "Privacy", "priv.d": "Captures and projects never leave your computer. No telemetry. The only network access is checking for updates.",
+      "guide.title": "User guide", "guide.sub": "Choose your language.",
+      "foot.d": "SnapMark for Windows. Installers and release notes are on",
+      "ver": "Version {v} · Windows 64-bit"
+    }
+  };
+  var GUIDES = [["id","Bahasa Indonesia"],["en","English"],["es","Español"],["de","Deutsch"],["ja","日本語"],["zh","简体中文"],["fr","Français"],["it","Italiano"],["pt","Português (Brasil)"],["ko","한국어"],["ru","Русский"],["ar","العربية"],["nl","Nederlands"]];
+  var lang = "id", version = null;
+
+  var ul = document.getElementById("guides");
+  GUIDES.forEach(function (g) {
+    var li = document.createElement("li"), a = document.createElement("a");
+    a.href = "https://github.com/" + REPO + "/blob/main/guide/" + g[0] + "/README.md";
+    a.textContent = g[1]; a.lang = g[0]; li.appendChild(a); ul.appendChild(li);
+  });
+
+  function apply() {
+    var d = T[lang];
+    document.documentElement.lang = lang;
+    document.querySelectorAll("[data-i18n]").forEach(function (el) {
+      var k = el.getAttribute("data-i18n");
+      if (k === "cta.meta" && version) return;
+      if (d[k] != null) el.innerHTML = d[k];
+    });
+    document.querySelectorAll("[data-i18n-aria]").forEach(function (el) { el.setAttribute("aria-label", d[el.getAttribute("data-i18n-aria")]); });
+    if (version) document.getElementById("dl-meta").textContent = d.ver.replace("{v}", version);
+    document.querySelectorAll(".lang button").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.lang === lang)); });
+    document.title = lang === "en" ? "SnapMark — Windows screenshots with annotations you can still edit" : "SnapMark — screenshot Windows dengan anotasi yang tetap bisa diedit";
+  }
+  document.querySelectorAll(".lang button").forEach(function (b) {
+    b.addEventListener("click", function () { lang = b.dataset.lang; try { localStorage.setItem("sm-lang", lang); } catch (e) {} apply(); });
+  });
+  var saved = null; try { saved = localStorage.getItem("sm-lang"); } catch (e) {}
+  lang = saved && T[saved] ? saved : ((navigator.language || "id").slice(0, 2) === "id" ? "id" : "en");
+  apply();
+
+  // Versi & tautan unduh langsung dari rilis terbaru; jika gagal, tombol tetap menuju halaman Releases.
+  fetch("https://api.github.com/repos/" + REPO + "/releases/latest", { headers: { Accept: "application/vnd.github+json" } })
+    .then(function (r) { return r.ok ? r.json() : Promise.reject(); })
+    .then(function (rel) {
+      var asset = (rel.assets || []).filter(function (a) { return /x64-setup\.exe$/.test(a.name); })[0];
+      if (!asset) return;
+      version = String(rel.tag_name || "").replace(/^v/, "");
+      document.getElementById("dl").href = asset.browser_download_url;
+      apply();
+    })
+    .catch(function () {});
+})();
+</script>
+</body>
+</html>
