@@ -36,7 +36,8 @@
   .lang button:first-child { border-radius: .4rem 0 0 .4rem; }
   .lang button:last-child { border-radius: 0 .4rem .4rem 0; border-left: 0; }
   .lang button[aria-pressed="true"] { background: var(--text); color: var(--bg); border-color: var(--text); }
-  .hero { padding-block: 4rem 3rem; display: grid; grid-template-columns: 1.1fr 1fr; gap: 3rem; align-items: center; }
+  .hero { padding-block: 4rem 2.5rem; }
+  .hero > div { max-width: 46rem; }
   h1 { font-size: clamp(2rem, 4.5vw, 3rem); line-height: 1.15; margin: 0 0 1rem; letter-spacing: -.02em; }
   .lead { font-size: 1.15rem; color: var(--muted); margin: 0 0 1.75rem; max-width: 32rem; }
   .cta { display: flex; flex-wrap: wrap; align-items: center; gap: .9rem 1.25rem; }
@@ -44,7 +45,15 @@
     padding: .8rem 1.4rem; border-radius: .6rem; }
   .btn:hover { filter: brightness(1.08); }
   .meta { font-size: .9rem; color: var(--muted); }
-  .art { width: 100%; height: auto; }
+  .shot { display: block; width: 100%; height: auto; border-radius: .8rem; border: 1px solid var(--line);
+    box-shadow: 0 18px 50px rgba(0,0,0,.18); background: var(--surface); }
+  .hero-shot { padding-bottom: 3.5rem; }
+  .gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(22rem, 1fr)); gap: 1.5rem; }
+  .gallery figure { margin: 0; }
+  .gallery a { display: block; }
+  .gallery figcaption { margin-top: .6rem; font-size: .95rem; color: var(--muted); }
+  .gallery figcaption strong { color: var(--text); display: block; }
+  .credit { margin-top: .5rem; font-size: .8rem; }
   section { padding: 3rem 0; border-top: 1px solid var(--line); }
   h2 { font-size: 1.6rem; margin: 0 0 .5rem; letter-spacing: -.01em; }
   .sub { color: var(--muted); margin: 0 0 2rem; max-width: 40rem; }
@@ -65,7 +74,7 @@
     background: var(--surface); color: var(--text); }
   .guides a:hover { border-color: var(--accent); }
   footer { border-top: 1px solid var(--line); padding: 2rem 0 3rem; color: var(--muted); font-size: .9rem; }
-  @media (max-width: 760px) { .hero { grid-template-columns: 1fr; padding-top: 2.5rem; } nav .hide-sm { display: none; } }
+  @media (max-width: 760px) { .hero { padding-top: 2.5rem; } nav .hide-sm { display: none; } }
 </style>
 </head>
 <body>
@@ -96,25 +105,9 @@
         <span class="meta" id="dl-meta" data-i18n="cta.meta">Windows 64-bit</span>
       </div>
     </div>
-    <svg class="art" viewBox="0 0 440 320" role="img" aria-label="Ilustrasi: area tangkapan dengan anotasi panah, kotak, dan nomor langkah" data-i18n-aria="art.alt">
-      <rect x="10" y="10" width="420" height="300" rx="14" fill="var(--surface)" stroke="var(--line)"/>
-      <rect x="10" y="10" width="420" height="34" rx="14" fill="var(--shot2)"/>
-      <rect x="10" y="30" width="420" height="14" fill="var(--shot2)"/>
-      <rect x="28" y="62" width="150" height="14" rx="4" fill="var(--shot2)"/>
-      <rect x="28" y="88" width="230" height="10" rx="4" fill="var(--shot)"/>
-      <rect x="28" y="108" width="200" height="10" rx="4" fill="var(--shot)"/>
-      <rect x="28" y="140" width="384" height="150" rx="8" fill="var(--shot)"/>
-      <rect x="44" y="156" width="120" height="70" rx="6" fill="var(--shot2)"/>
-      <rect x="180" y="156" width="214" height="12" rx="4" fill="var(--shot2)"/>
-      <rect x="180" y="178" width="170" height="12" rx="4" fill="var(--shot2)"/>
-      <rect x="180" y="200" width="190" height="12" rx="4" fill="var(--shot2)"/>
-      <rect x="44" y="244" width="350" height="30" rx="6" fill="#111" opacity=".85"/>
-      <rect x="36" y="146" width="148" height="86" rx="3" fill="none" stroke="var(--mark)" stroke-width="3"/>
-      <path d="M330 78 L196 148" stroke="var(--mark)" stroke-width="3.5" stroke-linecap="round"/>
-      <path d="M196 148 l15 -2 M196 148 l7 -14" stroke="var(--mark)" stroke-width="3.5" stroke-linecap="round"/>
-      <circle cx="350" cy="68" r="15" fill="var(--mark)"/>
-      <text x="350" y="74" text-anchor="middle" font-size="17" font-weight="700" fill="#fff" font-family="system-ui,sans-serif">1</text>
-    </svg>
+  </div>
+  <div class="wrap hero-shot">
+    <a href="img/shot-hero.webp"><img class="shot" src="img/shot-hero.webp" width="1686" height="1019" alt="SnapMark: area terpilih dengan lingkaran, kotak, teks, nomor langkah, dan sensor mozaik yang tetap bisa diedit" data-i18n-alt="art.alt" fetchpriority="high"></a>
   </div>
 
   <section id="fitur">
@@ -144,6 +137,19 @@
     </div>
   </section>
 
+  <section id="galeri">
+    <div class="wrap">
+      <h2 data-i18n="gal.title">Seperti apa tampilannya</h2>
+      <p class="sub" data-i18n="gal.sub">Tangkapan layar asli dari SnapMark.</p>
+      <div class="gallery">
+        <figure><a href="img/shot-select.webp"><img class="shot" src="img/shot-select.webp" width="1689" height="1024" loading="lazy" alt="" ></a><figcaption><strong data-i18n="g1.t">Pilih area</strong><span data-i18n="g1.d">Layar dibekukan; seret untuk memilih area.</span></figcaption></figure>
+        <figure><a href="img/shot-toolbar.webp"><img class="shot" src="img/shot-toolbar.webp" width="1688" height="1023" loading="lazy" alt=""></a><figcaption><strong data-i18n="g2.t">Toolbar di samping area</strong><span data-i18n="g2.d">Alat anotasi di bawah, salin dan simpan di samping kanan.</span></figcaption></figure>
+        <figure><a href="img/shot-palette.webp"><img class="shot" src="img/shot-palette.webp" width="1688" height="1022" loading="lazy" alt=""></a><figcaption><strong data-i18n="g3.t">Palet warna</strong><span data-i18n="g3.d">Pilih warna siap pakai dengan satu klik.</span></figcaption></figure>
+        <figure><a href="img/shot-rgb.webp"><img class="shot" src="img/shot-rgb.webp" width="1686" height="1018" loading="lazy" alt=""></a><figcaption><strong data-i18n="g4.t">Warna RGB atau HEX</strong><span data-i18n="g4.d">Atau tentukan warna sendiri.</span></figcaption></figure>
+      </div>
+    </div>
+  </section>
+
   <section id="privasi">
     <div class="wrap">
       <h2 data-i18n="priv.title">Privasi</h2>
@@ -164,6 +170,7 @@
   <div class="wrap">
     <span data-i18n="foot.d">SnapMark untuk Windows. Installer dan catatan rilis ada di</span>
     <a href="https://github.com/fajarsutomo/snapmark/releases">GitHub Releases</a>.
+    <div class="credit" data-i18n="credit">Contoh di tangkapan layar: artikel Wikipedia (CC BY-SA 4.0); Tux oleh Larry Ewing, dibuat dengan GIMP.</div>
   </div>
 </footer>
 
@@ -176,7 +183,13 @@
       "hero.title": "Screenshot dengan anotasi yang tetap bisa diedit.",
       "hero.lead": "Tangkap layar Windows, tandai dengan kotak, panah, teks, dan sensor. Setiap tanda adalah objek tersendiri, jadi bisa digeser, diubah, atau dihapus kapan saja, bahkan setelah disimpan.",
       "cta.download": "Unduh untuk Windows", "cta.meta": "Windows 64-bit",
-      "art.alt": "Ilustrasi: area tangkapan dengan anotasi panah, kotak, dan nomor langkah",
+      "art.alt": "SnapMark: area terpilih dengan lingkaran, kotak, teks, nomor langkah, dan sensor mozaik yang tetap bisa diedit",
+      "gal.title": "Seperti apa tampilannya", "gal.sub": "Tangkapan layar asli dari SnapMark.",
+      "g1.t": "Pilih area", "g1.d": "Layar dibekukan; seret untuk memilih area.",
+      "g2.t": "Toolbar di samping area", "g2.d": "Alat anotasi di bawah, salin dan simpan di samping kanan.",
+      "g3.t": "Palet warna", "g3.d": "Pilih warna siap pakai dengan satu klik.",
+      "g4.t": "Warna RGB atau HEX", "g4.d": "Atau tentukan warna sendiri.",
+      "credit": "Contoh di tangkapan layar: artikel Wikipedia (CC BY-SA 4.0); Tux oleh Larry Ewing, dibuat dengan GIMP.",
       "feat.title": "Dibuat agar hasilnya tetap bisa diperbaiki",
       "feat.sub": "Gambar asli tidak pernah diubah. Semua tanda disimpan terpisah di atasnya.",
       "f1.t": "Anotasi yang bisa diedit", "f1.d": "Persegi, elips, garis, panah, pena, penyorot, nomor langkah, dan teks. Klik untuk memilih, geser, ubah ukuran, warna, atau ketebalan.",
@@ -199,7 +212,13 @@
       "hero.title": "Screenshots with annotations you can still edit.",
       "hero.lead": "Capture your Windows screen and mark it up with boxes, arrows, text and redactions. Every mark is its own object, so you can move, change or delete it at any time, even after saving.",
       "cta.download": "Download for Windows", "cta.meta": "Windows 64-bit",
-      "art.alt": "Illustration: a captured area with an arrow, a box and a numbered step",
+      "art.alt": "SnapMark: a selected area with a circle, a box, text, a step number and a mosaic redaction, all still editable",
+      "gal.title": "See it in action", "gal.sub": "Real screenshots of SnapMark.",
+      "g1.t": "Pick an area", "g1.d": "The screen freezes; drag to choose an area.",
+      "g2.t": "Toolbars beside the area", "g2.d": "Annotation tools below, copy and save on the right.",
+      "g3.t": "Color palette", "g3.d": "Pick a ready-made color in one click.",
+      "g4.t": "RGB or HEX color", "g4.d": "Or set your own color.",
+      "credit": "Sample content in screenshots: Wikipedia article (CC BY-SA 4.0); Tux by Larry Ewing, made with The GIMP.",
       "feat.title": "Built so your result stays fixable",
       "feat.sub": "The original image is never changed. Every mark is stored separately on top of it.",
       "f1.t": "Editable annotations", "f1.d": "Rectangle, ellipse, line, arrow, pen, highlighter, step numbers and text. Click to select, then move, resize, or change color and thickness.",
@@ -236,6 +255,7 @@
       if (k === "cta.meta" && version) return;
       if (d[k] != null) el.innerHTML = d[k];
     });
+    document.querySelectorAll("[data-i18n-alt]").forEach(function (el) { el.setAttribute("alt", d[el.getAttribute("data-i18n-alt")]); });
     document.querySelectorAll("[data-i18n-aria]").forEach(function (el) { el.setAttribute("aria-label", d[el.getAttribute("data-i18n-aria")]); });
     if (version) document.getElementById("dl-meta").textContent = d.ver.replace("{v}", version);
     document.querySelectorAll(".lang button").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.lang === lang)); });
